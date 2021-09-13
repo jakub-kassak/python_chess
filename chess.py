@@ -21,6 +21,9 @@ class Hra:
     def __init__(self):
         self.enpassantB=0
         self.enpassantC=0
+        self.tah=1
+        self.pravidlo_50=0
+        self.na_tahu=True
 
 class Figura:
     def  __init__(self, x, y, farba):
@@ -30,6 +33,9 @@ class Figura:
 
     def __repr__(self):
         return '{} {} {} {}'.format(self.farba, self.__class__.__name__, chr(self.x+64), self.y)
+
+    def __delete__(self):
+        hra.pravidlo_50=0
 
     def Posun(self, ax, ay):
         if Nasachovnici([self.x + ax, self.y + ay]):
@@ -51,6 +57,7 @@ class Figura:
         if Find(kam,Figurky):
             vyhod=Pozicia(kam,Figurky)
         if enpassant!=0:
+            a=hra.pravidlo_50
             Docasne=Figurky[Pozicia([kam[0],kam[1]+enpassant],Figurky)]
             del Figurky[Pozicia([kam[0],kam[1]+enpassant],Figurky)]
         for i in range(len(Figurky)):
@@ -72,6 +79,7 @@ class Figura:
         self.x,self.y=x,y
         if enpassant!=0:
             Figurky.append(Docasne)
+            hra.pravidlo_50=a
         return False           
 
 class Jazdec(Figura):
@@ -96,6 +104,10 @@ class Jazdec(Figura):
             self.x=kam[0]
             self.y=kam[1]
             hra.enpassantB,hra.enpassantC=0,0
+            hra.na_tahu=not hra.na_tahu
+            if hra.na_tahu:
+                hra.tah+=1
+            hra.pravidlo_50+=1
 
 class Pesiak(Figura):
     def mozny_pohyb(self):
@@ -148,6 +160,10 @@ class Pesiak(Figura):
                     hra.enpassantC=self.x
             self.x=kam[0]
             self.y=kam[1]
+            hra.na_tahu=not hra.na_tahu
+            if hra.na_tahu:
+                hra.tah+=1
+            hra.pravidlo_50=0
         if self.y==p:
                 while True:
                     zmena=input('Zmeň na "dama", "veza", "strelec", "jazdec": ')
@@ -216,11 +232,16 @@ class Kral(Figura):
             self.x=kam[0]
             self.y=kam[1]
             hra.enpassantB,hra.enpassantC=0,0
+            hra.na_tahu=not hra.na_tahu
             self.malarosada, self.velkarosada = False,False
         elif not self.sach([self.x,self.y]):
             if self.Rosada(kam):
                 hra.enpassantB, hra.enpassantC = 0, 0
                 self.velkarosada, self.malarosada = False,False
+                hra.na_tahu=not hra.na_tahu
+                if hra.na_tahu:
+                    hra.tah+=1
+                hra.pravidlo_50+=1
 
 class Veza(Figura):
     def mozny_pohyb(self):
@@ -254,6 +275,10 @@ class Veza(Figura):
             self.x=kam[0]
             self.y=kam[1]
             hra.enpassantB,hra.enpassantC=0,0
+            hra.na_tahu=not hra.na_tahu
+            if hra.na_tahu:
+                hra.tah+=1
+            hra.pravidlo_50+=1
 
 class Dama(Figura):
     def mozny_pohyb(self):
@@ -279,6 +304,10 @@ class Dama(Figura):
             self.x=kam[0]
             self.y=kam[1]
             hra.enpassantB,hra.enpassantC=0,0
+            hra.na_tahu=not hra.na_tahu
+            if hra.na_tahu:
+                hra.tah+=1
+            hra.pravidlo_50+=1
 
 class Strelec(Figura):
     def mozny_pohyb(self):
@@ -304,6 +333,10 @@ class Strelec(Figura):
             self.x=kam[0]
             self.y=kam[1]
             hra.enpassantB,hra.enpassantC=0,0
+            hra.na_tahu=not hra.na_tahu
+            if hra.na_tahu:
+                hra.tah+=1
+            hra.pravidlo_50+=1
             
 hra=Hra()
 Figurky=[Kral(5,1,'B'), Kral(5,8,'C'), Dama(5,3,'B'), Dama(3,7,'C'), Veza(1,8,'C'), Veza(8,8,'C'),
@@ -314,7 +347,10 @@ while True:
         tah[0] = ord(tah[0]) - 64
         tah[2] = ord(tah[2]) - 64
     if Nasachovnici([int(tah[2]), int(tah[3])]):
-        Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)].pohyb([int(tah[2]), int(tah[3])])
+        f=Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)].farba
+        if hra.na_tahu and f=='B' or not hra.na_tahu and f=='C':
+                Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)].pohyb([int(tah[2]), int(tah[3])])
     else:
         print('Súradnica {}{} nie je na šachovnici'.format(chr(int(tah[2])+64), tah[3]))
     print(Figurky)
+    print(hra.tah, hra.pravidlo_50, hra.na_tahu)
