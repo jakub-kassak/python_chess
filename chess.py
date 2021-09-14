@@ -24,6 +24,30 @@ class Hra:
         self.tah=1
         self.pravidlo_50=0
         self.na_tahu=True
+    def mat(self):
+        koniec_tahov = True
+        if hra.na_tahu == True:
+            for i in range(len(Figurky)):
+                if Figurky[i].farba == 'C':
+                    zoznam = Figurky[i].mozny_pohyb()
+                    for pozicia in zoznam:
+                        if not Figurky[i].sach(pozicia):
+                            koniec_tahov = False
+                            break
+        else:
+            for i in range(len(Figurky)):
+                if Figurky[i].farba == 'B':
+                    zoznam = Figurky[i].mozny_pohyb()
+                    for pozicia in zoznam:
+                        if not Figurky[i].sach(pozicia):
+                            koniec_tahov = False
+                            break
+        if koniec_tahov and Figurky[1].ohrozenie:
+            print('Biely vyhral - sach mat')
+        elif koniec_tahov and Figurky[0].ohrozenie:
+            print('Cierny vyhral - sach mat')
+        elif koniec_tahov:
+            print('Remiza / pat')
 class Figura:
     def  __init__(self, x, y, farba):
         self.x = x
@@ -36,7 +60,7 @@ class Figura:
     def __del__(self):
         hra.pravidlo_50=-1
 
-    def Posun(self, ax, ay):
+    def posun(self, ax, ay):
         if Nasachovnici([self.x + ax, self.y + ay]):
             if  Find([self.x + ax, self.y + ay], Figurky):
                 if Figurky[Pozicia([self.x + ax, self.y + ay], Figurky)].farba == self.farba:
@@ -67,12 +91,10 @@ class Figura:
                 zoznam.extend(Figurky[i].mozny_pohyb())
         if self.farba=='B':
             if [Figurky[0].x,Figurky[0].y] in zoznam:
-                print('Po tomto ťahu budeš v šachu.')
                 self.x,self.y=x,y
                 return True
         if self.farba=='C':
             if [Figurky[1].x,Figurky[1].y] in zoznam:
-                print('Po tomto ťahu budeš v šachu.')
                 self.x,self.y=x,y
                 return True
         self.x,self.y=x,y
@@ -87,16 +109,16 @@ class Figura:
             for i in range(len(Figurky)):
                 if Figurky[i].farba == 'B':
                     zoznam = Figurky[i].mozny_pohyb()
-            if [Figurky[1].x, Figurky[1].y] in zoznam:
-                Figurky[1].ohrozenie = True
-                print('Cierny kral je v ohrozeni')
+                    if [Figurky[1].x, Figurky[1].y] in zoznam:
+                        Figurky[1].ohrozenie = True
+                        print('Cierny kral je v ohrozeni')
         elif self.farba == 'C':
             for i in range(len(Figurky)):
                 if Figurky[i].farba == 'C':
                     zoznam = Figurky[i].mozny_pohyb()
-            if [Figurky[0].x, Figurky[0].y] in zoznam:
-                Figurky[0].ohrozenie = True
-                print('Biely kral je v ohrozeni')
+                    if [Figurky[0].x, Figurky[0].y] in zoznam:
+                        Figurky[0].ohrozenie = True
+                        print('Biely kral je v ohrozeni')
 
     def pohyb_uspesny(self):
         #Neskôr tu bude aj kód na grafický posun
@@ -110,10 +132,10 @@ class Figura:
             hra.pravidlo_50+=1
         else:
             hra.pravidlo_50=0
+        hra.mat()
         hra.na_tahu=not hra.na_tahu
         if hra.na_tahu:
             hra.tah+=1
-            
 
 class Jazdec(Figura):
     def mozny_pohyb(self):
@@ -272,7 +294,7 @@ class Veza(Figura):
         for zmena in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
             a = 1
             while True:
-                b = self.Posun(zmena[0] * a, zmena[1] * a)
+                b = self.posun(zmena[0] * a, zmena[1] * a)
                 if b == ['', 'stop']:
                     break
                 elif b[1] == 'stop':
@@ -304,7 +326,7 @@ class Dama(Figura):
         for zmena in [[1,0], [-1,0], [0,1], [0,-1], [1,1], [1,-1], [-1,1], [-1,-1]]:
             a = 1
             while True:
-                b = self.Posun(zmena[0]*a, zmena[1]*a)
+                b = self.posun(zmena[0] * a, zmena[1] * a)
                 if b == ['', 'stop']:
                     break
                 elif b[1] == 'stop':
@@ -328,7 +350,7 @@ class Strelec(Figura):
         for zmena in [[1,1], [1,-1], [-1,1], [-1,-1]]:
             a = 1
             while True:
-                b = self.Posun(zmena[0] * a, zmena[1] * a)
+                b = self.posun(zmena[0] * a, zmena[1] * a)
                 if b == ['', 'stop']:
                     break
                 elif b[1] == 'stop':
@@ -347,10 +369,11 @@ class Strelec(Figura):
             self.pohyb_uspesny()
 
 hra=Hra()
-Figurky=[Kral(5,1,'B'), Kral(6,8,'C'), Veza(1,1,'B'), Strelec(5,7, 'C')]
+Figurky=[Kral(7,6,'B'), Kral(2,8,'C'), Veza(1,1,'B'), Veza(3,2, 'B')]
+print(Figurky)
 while True:
-    tah = input('Zadaj ťah, 4 čísla vo formáte "a,b,c,d" - a,b-z miesta, c,d-kam\nalebo vo formáte "A,1,B,2" - A,1-z miesta, B,2-kam: ').split(',')
-    #tah = input().split(',')
+    #tah = input('Zadaj ťah, 4 čísla vo formáte "a,b,c,d" - a,b-z miesta, c,d-kam\nalebo vo formáte "A,1,B,2" - A,1-z miesta, B,2-kam: ').split(',')
+    tah = input().split(',')
     if tah[0] not in '123456879':
         tah[0] = ord(tah[0]) - 64
         tah[2] = ord(tah[2]) - 64
@@ -361,5 +384,5 @@ while True:
     else:
         print('Súradnica {}{} nie je na šachovnici alebo na súradnici {}{} nie je žiadna figúrka!'.format(chr(int(tah[2])+64), tah[3], chr(int(tah[0])+64), tah[1]))
     print(Figurky)
-    print(Figurky[0].ohrozenie, Figurky[1].ohrozenie)
-    print('Tah:',hra.tah, ', Pravidlo 50:', hra.pravidlo_50, ', Biely na tahu:',hra.na_tahu)
+    #print(Figurky[0].ohrozenie, Figurky[1].ohrozenie)
+    #print('Tah:',hra.tah, ', Pravidlo 50:', hra.pravidlo_50, ', Biely na tahu:',hra.na_tahu)
