@@ -24,6 +24,7 @@ class Hra:
         self.tah=1
         self.pravidlo_50=0
         self.na_tahu=True
+        self.koniec=False
     def mat(self):
         koniec_tahov = True
         if hra.na_tahu == True:
@@ -44,10 +45,13 @@ class Hra:
                             break
         if koniec_tahov and Figurky[1].ohrozenie:
             print('Biely vyhral - sach mat')
+            self.koniec=True
         elif koniec_tahov and Figurky[0].ohrozenie:
             print('Cierny vyhral - sach mat')
+            self.koniec=True
         elif koniec_tahov:
-            print('Remiza / pat')
+            print('Pat')
+            self.koniec=True
 class Figura:
     def  __init__(self, x, y, farba):
         self.x = x
@@ -371,18 +375,31 @@ class Strelec(Figura):
 hra=Hra()
 Figurky=[Kral(7,6,'B'), Kral(2,8,'C'), Veza(1,1,'B'), Veza(3,2, 'B')]
 print(Figurky)
-while True:
+while not hra.koniec:
     #tah = input('Zadaj ťah, 4 čísla vo formáte "a,b,c,d" - a,b-z miesta, c,d-kam\nalebo vo formáte "A,1,B,2" - A,1-z miesta, B,2-kam: ').split(',')
     tah = input().split(',')
-    if tah[0] not in '123456879':
-        tah[0] = ord(tah[0]) - 64
-        tah[2] = ord(tah[2]) - 64
-    if Nasachovnici([int(tah[2]), int(tah[3])]) and Find([int(tah[0]), int(tah[1])], Figurky):
-        f=Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)]
-        if hra.na_tahu and f.farba=='B' or not hra.na_tahu and f.farba=='C':
-                f.pohyb([int(tah[2]), int(tah[3])])
+    if tah==['vzdavam sa']:
+        if hra.na_tahu:
+            print('Čierny vyhral - biely sa vzdal.')
+        else:
+            print('Biely vyhral - čierny sa vzdal.')
+        hra.koniec=True
+    elif tah==['remiza'] and hra.pravidlo_50>=100:
+        print('Remíza')
+        hra.koniec=True
     else:
-        print('Súradnica {}{} nie je na šachovnici alebo na súradnici {}{} nie je žiadna figúrka!'.format(chr(int(tah[2])+64), tah[3], chr(int(tah[0])+64), tah[1]))
+        if tah[0] not in '123456879':
+            tah[0] = ord(tah[0]) - 64
+            tah[2] = ord(tah[2]) - 64
+        if Nasachovnici([int(tah[2]), int(tah[3])]) and Find([int(tah[0]), int(tah[1])], Figurky):
+            f=Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)]
+            if hra.na_tahu and f.farba=='B' or not hra.na_tahu and f.farba=='C':
+                    f.pohyb([int(tah[2]), int(tah[3])])
+        else:
+            print('Súradnica {}{} nie je na šachovnici alebo na súradnici {}{} nie je žiadna figúrka!'.format(chr(int(tah[2])+64), tah[3], chr(int(tah[0])+64), tah[1]))
+    if len(Figurky)==2:
+        print('Remíza')
+        hra.koniec=True
     print(Figurky)
     #print(Figurky[0].ohrozenie, Figurky[1].ohrozenie)
     #print('Tah:',hra.tah, ', Pravidlo 50:', hra.pravidlo_50, ', Biely na tahu:',hra.na_tahu)
