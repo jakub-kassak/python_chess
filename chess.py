@@ -208,22 +208,26 @@ class Kral(Figura):
                     if not ([3,1] in zoznam or [4,1] in zoznam):
                         Figurky[Pozicia([1, 1], Figurky)].x = 4
                         self.x = kam[0]
+                        return True
             if kam == [7, 1] and self.malarosada == True:
                 if (Find([7, 1], Figurky) or Find([6, 1], Figurky)) == False:
                     if not ([7, 1] in zoznam or [6, 1] in zoznam):
                         self.x = 7
                         Figurky[Pozicia([8, 1], Figurky)].x = 6
+                        return True
         if self.farba == 'C':
             if kam == [3, 8] and self.velkarosada == True:
                 if  (Find([2, 8], Figurky) or Find([3, 8], Figurky) or Find([4, 8], Figurky))== False:
                     if not ( [3, 8] in zoznam or [4, 8] in zoznam):
                         self.x = 3
                         Figurky[Pozicia([1, 8], Figurky)].x = 4
+                        return True
             if kam == [7, 8] and self.malarosada == True:
                 if (Find([7, 8], Figurky) and not Find([6, 8], Figurky)) == False:
                     if not ([7, 8] in zoznam or [6, 8] in zoznam):
                         self.x = 7
                         Figurky[Pozicia([8, 8], Figurky)].x = 6
+                        return True
 
     def pohyb(self,kam):
         if kam in self.mozny_pohyb() and not self.sach(kam):
@@ -346,10 +350,10 @@ while True:
     if tah[0] not in '123456879':
         tah[0] = ord(tah[0]) - 64
         tah[2] = ord(tah[2]) - 64
-    if Nasachovnici([int(tah[2]), int(tah[3])]):
-        f=Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)].farba
-        if hra.na_tahu and f=='B' or not hra.na_tahu and f=='C':
-                Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)].pohyb([int(tah[2]), int(tah[3])])
+    if Nasachovnici([int(tah[2]), int(tah[3])]) and Find([int(tah[0]), int(tah[1])], Figurky):
+        f=Figurky[Pozicia([int(tah[0]), int(tah[1])], Figurky)]
+        if hra.na_tahu and f.farba=='B' or not hra.na_tahu and f.farba=='C':
+                f.pohyb([int(tah[2]), int(tah[3])])
     else:
         print('Súradnica {}{} nie je na šachovnici'.format(chr(int(tah[2])+64), tah[3]))
     print(Figurky)
