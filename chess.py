@@ -4,7 +4,6 @@ def Find(poz,zoznam):
         if poz==[figurka.x,figurka.y]:
             return True
     return False
-
 def Pozicia(poz,zoznam):
     #Nájde pozíciu figurky v liste podľa jej pozície
     for i in range(len(zoznam)):
@@ -16,6 +15,7 @@ def Nasachovnici(poz):
         return True
     else:
         return False
+
 class Hra:
     #Pre globálne premenné, môžme sem ešte doplniť premenné pre ťah, kto je na rade...
     def __init__(self):
@@ -24,7 +24,6 @@ class Hra:
         self.tah=1
         self.pravidlo_50=0
         self.na_tahu=True
-
 class Figura:
     def  __init__(self, x, y, farba):
         self.x = x
@@ -80,8 +79,35 @@ class Figura:
         if enpassant!=0:
             Figurky.append(Docasne)
             hra.pravidlo_50=a
-        return False           
-
+        return False
+    def v_sachu(self):
+        zoznam = []
+        if self.farba == 'B':
+            for i in range(len(Figurky)):
+                if Figurky[i].farba != 'B':
+                    print(type(Figurky[i]), end='')
+                    docasny_zoznam = Figurky[i].mozny_pohyb()
+                    print(docasny_zoznam)
+                    for pozicia in docasny_zoznam:
+                        if not Figurky[i].sach(pozicia):
+                            zoznam.append(pozicia)
+                            print(pozicia, end='')
+                    print()
+            if [Figurky[0].x, Figurky[0].y] in zoznam:
+                Figurky[0].v_sachu = True
+        elif self.farba == 'C':
+            for i in range(len(Figurky)):
+                if Figurky[i].farba != 'C':
+                    print(type(Figurky[i]), end='')
+                    docasny_zoznam = Figurky[i].mozny_pohyb()
+                    print(docasny_zoznam)
+                    for pozicia in docasny_zoznam:
+                        if not Figurky[i].sach(pozicia):
+                            zoznam.append(pozicia)
+                            print(pozicia, end='')
+                    print()
+            if [Figurky[1].x, Figurky[1].y] in zoznam:
+                Figurky[1].v_sachu = True
 class Jazdec(Figura):
     def mozny_pohyb(self):
         a,b=1,2
@@ -108,7 +134,6 @@ class Jazdec(Figura):
             if hra.na_tahu:
                 hra.tah+=1
             hra.pravidlo_50+=1
-
 class Pesiak(Figura):
     def mozny_pohyb(self):
         zoznam=[]
@@ -180,12 +205,12 @@ class Pesiak(Figura):
                         Figurky.append(Jazdec(self.x,p,'B'))
                         break
                 del Figurky[Pozicia([self.x,p],Figurky)]
-
 class Kral(Figura):
     def __init__(self, x, y, farba):
         Figura.__init__(self, x, y, farba)
         self.malarosada = True
         self.velkarosada = True
+        self.v_sachu = False
         
     def mozny_pohyb(self):
         smery =[ [self.x+1,self.y], [self.x+1,self.y+1], [self.x,self.y+1], [self.x-1,self.y+1] ]
@@ -246,7 +271,6 @@ class Kral(Figura):
                 if hra.na_tahu:
                     hra.tah+=1
                 hra.pravidlo_50+=1
-
 class Veza(Figura):
     def mozny_pohyb(self):
         zoznam = []
@@ -278,12 +302,12 @@ class Veza(Figura):
                 Figurky[1].malarosada = False
             self.x=kam[0]
             self.y=kam[1]
+            self.v_sachu()
             hra.enpassantB,hra.enpassantC=0,0
             hra.na_tahu=not hra.na_tahu
             if hra.na_tahu:
                 hra.tah+=1
             hra.pravidlo_50+=1
-
 class Dama(Figura):
     def mozny_pohyb(self):
         zoznam = []
@@ -312,7 +336,6 @@ class Dama(Figura):
             if hra.na_tahu:
                 hra.tah+=1
             hra.pravidlo_50+=1
-
 class Strelec(Figura):
     def mozny_pohyb(self):
         zoznam = []
@@ -341,10 +364,9 @@ class Strelec(Figura):
             if hra.na_tahu:
                 hra.tah+=1
             hra.pravidlo_50+=1
-            
+
 hra=Hra()
-Figurky=[Kral(5,1,'B'), Kral(5,8,'C'), Dama(5,3,'B'), Dama(3,7,'C'), Veza(1,8,'C'), Veza(8,8,'C'),
-        Jazdec(3,4,'C'), Strelec(7,3,'B'), Pesiak(6,7,'C'), Pesiak(5,5,'B')]
+Figurky=[Kral(5,1,'B'), Kral(5,8,'C'), Veza(1,1,'B'), Veza(5,2,'B'), Veza(8,8,'C'), Strelec(5,7, 'C')]
 while True:
     tah = input('Zadaj ťah, 4 čísla vo formáte "a,b,c,d" - a,b-z miesta, c,d-kam: ').split(',')
     if tah[0] not in '123456879':
